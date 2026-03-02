@@ -19,15 +19,13 @@ jobs:
             echo "Site is DOWN (HTTP $HTTP_STATUS)"
             exit 1
           fi
-               - name: Send Telegram alert
+
+      - name: Send Telegram alert
         if: failure()
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          curl -s -X POST \
-            "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-            --data-urlencode "text=🔴 AI Office НЕДОСТУПЕН
-
-https://myaioffice.ru не отвечает
-Время: $(date '+%H:%M %d.%m.%Y UTC')
-
-Проверь VPS: ssh root@45.145.6.48"
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${CHAT_ID}" \
+            -d "text=🔴 AI Office НЕДОСТУПЕН%0Ahttps://myaioffice.ru не отвечает%0AВремя: $(date '+%H:%M %d.%m.%Y UTC')"
